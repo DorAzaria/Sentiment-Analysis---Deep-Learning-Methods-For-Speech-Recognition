@@ -12,8 +12,6 @@ DIMENSION = 512 * 300
 
 class ConvNet(nn.Module):
 
-    def cal_paddind_shape(self, new_shape, old_shape, kernel_size, stride_size):
-        return (stride_size * (new_shape - 1) + kernel_size - old_shape) / 2
 
     def __init__(self):
         super().__init__()
@@ -49,7 +47,7 @@ class ConvNet(nn.Module):
             # first dense layer
             nn.Linear(64, 1024), nn.ReLU(), nn.Dropout(p=0.5),
             # second dense layer
-            nn.Linear(1024, 8), nn.ReLU(), nn.LogSoftmax(dim=1),)
+            nn.Linear(1024, 7), nn.ReLU(), nn.LogSoftmax(dim=1),)
 
     def forward(self, X):
         return self.network(X)
