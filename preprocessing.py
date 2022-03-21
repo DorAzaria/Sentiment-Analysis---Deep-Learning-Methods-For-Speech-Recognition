@@ -23,10 +23,9 @@ class Data:
         # surprise has been changed from 8 to 0
 
         self.classes = {1: 'neutral', 2: 'calm', 3: 'happy', 4: 'sad', 5: 'angry', 6: 'fear', 7: 'disgust', 0: 'surprise'}
-
         x_dataset = [embedding[1] for embedding in data]
         y_dataset = [label[2] for label in data]
-        train_x, test_x, train_y, test_y = train_test_split(np.array(x_dataset), np.array(y_dataset), test_size=0.2)
+        train_x, test_x, train_y, test_y = train_test_split(np.array(x_dataset), np.array(y_dataset), test_size = 0.2)
 
         train_x = torch.from_numpy(train_x)
         train_y = torch.from_numpy(train_y)
@@ -36,6 +35,6 @@ class Data:
         test_y = torch.from_numpy(test_y)
         torch_test = TensorDataset(test_x, test_y)
 
-        self.train_loader = DataLoader(torch_train, batch_size = 28, shuffle=True)
-        self.test_loader = DataLoader(torch_test, batch_size = 28, shuffle=False)
+        self.train_loader = DataLoader(torch_train, batch_size = 28, shuffle = True)
+        self.test_loader = DataLoader(torch_test, batch_size = 28, shuffle = False)
 

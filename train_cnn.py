@@ -63,8 +63,8 @@ for epoch in range(model.get_epochs()):
         loss.backward()
         optimizer.step()
 
-        if epoch % 50 == 0 and i == 0:
-            print (f'Epoch [{epoch+1}/{model.get_epochs()}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
+        if (i + 1) % 40 == 0:
+            print(f'Epoch [{epoch+1}/{model.get_epochs()}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
 
 with torch.no_grad():
     n_correct = 0
