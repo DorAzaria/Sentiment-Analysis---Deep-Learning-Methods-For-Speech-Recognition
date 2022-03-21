@@ -19,32 +19,26 @@ class ConvNet(nn.Module):
 
         super().__init__()
 
-        self.conv_2d_1 = nn.Conv2d(1, 96, kernel_size=(7, 7), stride=(2, 2), padding=1)
-        self.bn_1 = nn.BatchNorm2d(96)
-        self.max_pool_2d_1 = nn.MaxPool2d(kernel_size=(3, 3), stride=(2, 2))
+        self.conv_2d_1 = nn.Conv2d(1, 16, kernel_size = (3, 3), stride = (1, 1), padding = 1)
+        self.bn_1 = nn.BatchNorm2d(16)
+        self.max_pool_2d_1 = nn.MaxPool2d(kernel_size = (2, 2), stride = (2, 2))
+        # [16,74,16]
 
-        self.conv_2d_2 = nn.Conv2d(96, 256, kernel_size=(5, 5), stride=(2, 2), padding=1)
-        self.bn_2 = nn.BatchNorm2d(256)
-        self.max_pool_2d_2 = nn.MaxPool2d(kernel_size=(3, 3), stride=(2, 2))
+        self.conv_2d_2 = nn.Conv2d(16, 32, kernel_size = (3, 3), stride=(1, 1), padding=1)
+        self.bn_2 = nn.BatchNorm2d(32)
+        self.max_pool_2d_2 = nn.MaxPool2d(kernel_size = (2, 2), stride = (2, 2))
+        # [32,36,8]
 
-        self.conv_2d_3 = nn.Conv2d(256, 384, kernel_size=(3, 3), padding=1)
-        self.bn_3 = nn.BatchNorm2d(384)
+        self.conv_2d_3 = nn.Conv2d(32, 64, kernel_size = (3, 3),  stride = (1, 1), padding = 1)
+        self.bn_3 = nn.BatchNorm2d(64)
+        self.max_pool_2d_3 = nn.MaxPool2d(kernel_size = (2, 2), stride = (2, 2))
+        self.drop_3 = nn.Dropout(p = DROP_OUT)
+        # [64,18,4]
 
-        self.conv_2d_4 = nn.Conv2d(384, 256, kernel_size=(3, 3), padding=1)
-        self.bn_4 = nn.BatchNorm2d(256)
+        self.dense_1 = nn.Linear(4608, 1024)
+        self.drop_2 = nn.Dropout(p = DROP_OUT)
 
-        self.conv_2d_5 = nn.Conv2d(256, 256, kernel_size=(3, 3), padding=1)
-        self.bn_5 = nn.BatchNorm2d(256)
-        self.max_pool_2d_3 = nn.MaxPool2d(kernel_size=(5, 3), stride=(3, 2))
-
-        self.conv_2d_6 = nn.Conv2d(256, 4096, kernel_size=(9, 1), padding=0)
-        self.drop_1 = nn.Dropout(p=DROP_OUT)
-
-        self.global_avg_pooling_2d = nn.AdaptiveAvgPool2d((1, 1))
-        self.dense_1 = nn.Linear(4096, 1024)
-        self.drop_2 = nn.Dropout(p=DROP_OUT)
-
-        self.dense_2 = nn.Linear(1024, 7)
+        self.dense_2 = nn.Linear(1024, 8)
 
     def forward(self, X):
 
@@ -58,29 +52,18 @@ class ConvNet(nn.Module):
 
         x = nn.ReLU()(self.conv_2d_3(x))
         x = self.bn_3(x)
-
-        x = nn.ReLU()(self.conv_2d_4(x))
-        x = self.bn_4(x)
-
-        x = nn.ReLU()(self.conv_2d_5(x))
-        x = self.bn_5(x)
         x = self.max_pool_2d_3(x)
 
-        x = nn.ReLU()(self.conv_2d_6(x))
-        x = self.drop_1(x)
-        x = self.global_avg_pooling_2d(x)
-
-        x = x.view(-1, x.shape[1])  # output channel for flatten before entering the dense layer
+        x = x.view(28, -1)  # output channel for flatten before entering the dense layer
         x = nn.ReLU()(self.dense_1(x))
-        x = self.drop_2(x)
 
         x = self.dense_2(x)
-        y = nn.LogSoftmax(dim=1)(x)   # consider using Log-Softmax
+        y = nn.LogSoftmax(dim = 1)(x)   # consider using Log-Softmax
 
         return y
 
     def get_epochs(self):
-        return 3
+        return 700
 
     def get_learning_rate(self):
         return 0.0001
@@ -90,4 +73,3 @@ class ConvNet(nn.Module):
 
     def to_string(self):
         return "Convolutional_Speaker_Identification_Log_Softmax_Model-epoch_"
-

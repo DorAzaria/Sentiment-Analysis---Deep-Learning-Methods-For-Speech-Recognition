@@ -40,17 +40,20 @@ model = ConvNet().to(device)
 
 # setting model's parameters
 learning_rate = model.get_learning_rate()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr = learning_rate)
 
 criterion = torch.nn.CrossEntropyLoss()
 epoch, batch_size = model.get_epochs(), model.get_batch_size()
 
 n_total_steps = len(dataset.train_loader)
+
 for epoch in range(model.get_epochs()):
     for i, (embedding, labels) in enumerate(dataset.train_loader):
 
         embedding = embedding.to(device)
+        labels = labels.type(torch.LongTensor)
         labels = labels.to(device)
+
         # Forward pass
         outputs = model(embedding)
         loss = criterion(outputs, labels)
@@ -60,5 +63,38 @@ for epoch in range(model.get_epochs()):
         loss.backward()
         optimizer.step()
 
-        if (i+1) % 2000 == 0:
+        if epoch % 50 == 0 and i == 0:
             print (f'Epoch [{epoch+1}/{model.get_epochs()}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
+
+with torch.no_grad():
+    n_correct = 0
+    n_samples = 0
+    n_class_correct = [0 for i in range(8)]
+    n_class_samples = [0 for i in range(8)]
+    for embedding, labels in dataset.test_loader:
+        embedding = embedding.to(device)
+        print(f'75{embedding.shape}')
+        if embedding.shape[0] == 7: break
+        labels = labels.type(torch.LongTensor)
+
+        labels = labels.to(device)
+        outputs = model(embedding)
+
+        # max returns (value ,index)
+        _, predicted = torch.max(outputs, 1)
+        n_samples += labels.size(0)
+        n_correct += (predicted == labels).sum().item()
+
+        for i in range(batch_size):
+            label = labels[i]
+            pred = predicted[i]
+            if label == pred:
+                n_class_correct[label] += 1
+            n_class_samples[label] += 1
+
+    acc = 100.0 * n_correct / n_samples
+    print(f'Accuracy of the network: {acc} %')
+
+    for i in range(10):
+        acc = 100.0 * n_class_correct[i] / n_class_samples[i]
+        print(f'Accuracy of {dataset.classes[i]}: {acc} %')
