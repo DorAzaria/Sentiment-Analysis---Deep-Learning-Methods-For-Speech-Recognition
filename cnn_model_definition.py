@@ -53,7 +53,7 @@ class ConvNet(nn.Module):
         return self.network(X)
 
     def get_epochs(self):
-        return 50
+        return 200
 
     def get_learning_rate(self):
         return 0.0001

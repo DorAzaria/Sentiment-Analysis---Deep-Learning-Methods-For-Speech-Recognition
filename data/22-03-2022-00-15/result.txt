@@ -1,0 +1,8 @@
+Accuracy of the network: 58.333333333333336 %
+Accuracy of surprise: 45.714285714285715 %
+Accuracy of calm: 58.333333333333336 %
+Accuracy of happy: 50.0 %
+Accuracy of sad: 66.35514018691589 %
+Accuracy of angry: 55.0 %
+Accuracy of fear: 25.0 %
+Accuracy of disgust: 71.57894736842105 %
