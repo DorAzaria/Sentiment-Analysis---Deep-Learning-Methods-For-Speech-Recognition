@@ -3,7 +3,6 @@ The code is based on : https://github.com/a-nagrani/VGGVox/issues/1
 ******************************************************************"""
 
 from torch import nn
-import constants as c
 import torch
 
 DROP_OUT = 0.5
@@ -53,7 +52,7 @@ class ConvNet(nn.Module):
         return self.network(X)
 
     def get_epochs(self):
-        return 50
+        return 150
 
     def get_learning_rate(self):
         return 0.0001

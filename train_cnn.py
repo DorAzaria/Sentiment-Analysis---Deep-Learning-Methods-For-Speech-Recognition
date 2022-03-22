@@ -34,7 +34,7 @@ epoch, batch_size = model.get_epochs(), model.get_batch_size()
 
 n_total_steps = len(dataset.train_loader)
 
-for epoch in range(0):
+for epoch in range(model.get_epochs()):
     for i, (embedding, labels) in enumerate(dataset.train_loader):
 
         embedding = embedding.to(device)
@@ -50,8 +50,8 @@ for epoch in range(0):
         loss.backward()
         optimizer.step()
 
-        if (i + 1) % 40 == 0:
-            print(f'Epoch [{epoch + 1}/{model.get_epochs()}], Step [{i + 1}/{n_total_steps}], Loss: {loss.item():.4f}')
+        if (i + 1) % 77 == 0:
+            print(f'Epoch [{epoch + 1}/{model.get_epochs()}], Loss: {loss.item():.4f}')
 
 saved_results = []
 
@@ -94,8 +94,9 @@ directory = 'data/' + str(saved_time)
 os.mkdir(directory)
 
 with open(directory + "/" + file_name, 'w') as f:
+    f.write(f'{saved_time} ,          Number of epochs:   {model.get_epochs()} \n')
+    f.write('------------------------------------------------------------------\n')
     for line in saved_results:
-        f.write(line)
-        f.write('\n')
+        f.write(line + '\n')
 
 torch.save(model, directory + "/model.pth")

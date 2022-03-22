@@ -36,6 +36,5 @@ class Data:
         torch_test = TensorDataset(test_x, test_y)
 
         self.train_loader = DataLoader(torch_train, batch_size = 28, drop_last = True, shuffle = True)
-
         self.test_loader = DataLoader(torch_test, batch_size = 28, drop_last = True, shuffle = False)
 
