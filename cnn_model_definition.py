@@ -11,7 +11,6 @@ DIMENSION = 512 * 300
 
 class ConvNet(nn.Module):
 
-
     def __init__(self):
         super().__init__()
         self.network = nn.Sequential(
@@ -46,13 +45,13 @@ class ConvNet(nn.Module):
             # first dense layer
             nn.Linear(64, 1024), nn.ReLU(), nn.Dropout(p=0.5),
             # second dense layer
-            nn.Linear(1024, 7), nn.ReLU(), nn.LogSoftmax(dim=1),)
+            nn.Linear(1024, 7), nn.ReLU(), nn.LogSoftmax(dim=1), )
 
     def forward(self, X):
         return self.network(X)
 
     def get_epochs(self):
-        return 150
+        return 100
 
     def get_learning_rate(self):
         return 0.0001

@@ -2,24 +2,11 @@ import torch
 from cnn_model_definition import ConvNet
 import numpy as np
 import os
-from tqdm import tqdm
-import datetime
-import matplotlib
-from preprocessing import Data
+from preprocess.preprocessing import Data
 import pickle
 import datetime
 
 
-def top_k_accuracy(k, proba_pred_y, mini_y_test):
-    top_k_pred = proba_pred_y.argsort(axis=1)[:, -k:]
-    final_pred = [False] * len(mini_y_test)
-    for j in range(len(mini_y_test)):
-        final_pred[j] = True if sum(top_k_pred[j] == mini_y_test[j]) > 0 else False
-    return np.mean(final_pred)
-
-
-filehandler = open('data/dataset.pth', 'rb')
-dataset = pickle.load(filehandler)
 dataset = Data()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -50,7 +37,7 @@ for epoch in range(model.get_epochs()):
         loss.backward()
         optimizer.step()
 
-        if (i + 1) % 77 == 0:
+        if i == 76:
             print(f'Epoch [{epoch + 1}/{model.get_epochs()}], Loss: {loss.item():.4f}')
 
 saved_results = []
@@ -67,6 +54,7 @@ with torch.no_grad():
         labels = labels.to(device)
         outputs = model(embedding)
 
+        # euler FIX
         # max returns (value ,index)
         _, predicted = torch.max(outputs, 1)
         n_samples += labels.size(0)
@@ -90,7 +78,7 @@ with torch.no_grad():
 
 saved_time = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M")
 file_name = 'result.txt'
-directory = 'data/' + str(saved_time)
+directory = 'data/outputs/' + str(saved_time)
 os.mkdir(directory)
 
 with open(directory + "/" + file_name, 'w') as f:
