@@ -10,12 +10,13 @@ from sklearn.model_selection import train_test_split
 class Data:
 
     def __init__(self):
-        file_handler = open('data/datasets/dataset2.pth', 'rb')
+        file_handler = open('data/datasets/dataset3.pth', 'rb')
         data = pickle.load(file_handler)
 
         # surprise has been changed from 8 to 0
-        self.classes = {0: 'surprise', 1: 'calm', 2: 'happy', 3: 'sad', 4: 'angry', 5: 'fear', 6: 'disgust'}
-        self.num_of_classes = 7
+        # self.classes = {0: 'surprise', 1: 'calm', 2: 'happy', 3: 'sad', 4: 'angry', 5: 'fear', 6: 'disgust'}
+        self.classes = {0: 'positive', 1: 'neutral', 2: 'negative'}
+        self.num_of_classes = len(self.classes)
 
         x_dataset = [embedding[1] for embedding in data]
         y_dataset = [label[2] for label in data]
