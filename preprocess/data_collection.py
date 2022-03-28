@@ -186,7 +186,7 @@ from sklearn.model_selection import train_test_split
 #     for i, file_path in enumerate(data.Path):
 #         emission, _ = model(speech_file_to_array_fn(file_path))
 #         features = emission.detach().cpu().numpy()
-#         normalize_features(features)
+#         normalize_features(features) [1,149,29] [[149X29]]
 #         check = 0
 #         if features.shape[1] != 149:
 #             print(f'\n{j} is not in shape of 149, current shape: {features.shape[1]}')
