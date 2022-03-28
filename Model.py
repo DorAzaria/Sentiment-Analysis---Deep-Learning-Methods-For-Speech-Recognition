@@ -8,13 +8,13 @@ NUM_OF_CLASSES = 3
 
 class ConvNet(nn.Module):
 
-    def __init__(self, num_of_classes):
+    def __init__(self, num_of_classes, dataset):
         super().__init__()
         # Hyper parameters
         self.epochs = 100
         self.batch_size = 28
         self.learning_rate = 0.001
-
+        self.dataset = dataset
         # Model Architecture
         self.first_conv = nn.Conv2d(1, 96, kernel_size=(5, 5), padding=1)
         self.first_bn = nn.BatchNorm2d(96)
@@ -86,17 +86,16 @@ class ConvNet(nn.Module):
         return self.batch_size
 
     def train_model(self):
-        dataset = Data()
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-        criterion = torch.nn.CrossEntropyLoss()
+        criterion = torch.nn.CrossEntropyLoss(weight=torch.tensor([2.103336921, 3.187601958, 1]))
 
-        n_total_steps = len(dataset.train_loader)
+        n_total_steps = len(self.dataset.train_loader)
 
         for epoch in range(self.get_epochs()):
-            for i, (embedding, labels) in enumerate(dataset.train_loader):
+            for i, (embedding, labels) in enumerate(self.dataset.train_loader):
 
                 embedding = embedding.type(torch.FloatTensor)
                 labels = labels.type(torch.LongTensor)
@@ -110,9 +109,5 @@ class ConvNet(nn.Module):
                 loss.backward()
                 optimizer.step()
 
-                if (i + 1) % 77 == 0:
+                if i == 86:
                     print(f'Epoch [{epoch + 1}/{self.epochs}], Step [{i + 1}/{n_total_steps}], Loss: {loss.item():.4f}')
-
-
-cnn = ConvNet(7)
-cnn.train_model()

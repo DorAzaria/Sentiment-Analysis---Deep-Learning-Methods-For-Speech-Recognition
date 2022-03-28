@@ -1,5 +1,5 @@
 import torch
-from ConvNet import Convolutional_Speaker_Identification
+from Model import Convolutional_Speaker_Identification
 import numpy as np
 import os
 from tqdm import tqdm

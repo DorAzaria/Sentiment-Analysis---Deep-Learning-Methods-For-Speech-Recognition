@@ -10,16 +10,12 @@ from sklearn.model_selection import train_test_split
 class Data:
 
     def __init__(self):
-        file_handler = open('data/datasets/dataset2.pth', 'rb')
+        file_handler = open('data/datasets/dataset3.pth', 'rb')
         data = pickle.load(file_handler)
-
-        # surprise has been changed from 8 to 0
-        self.classes = {0: 'surprise', 1: 'calm', 2: 'happy', 3: 'sad', 4: 'angry', 5: 'fear', 6: 'disgust'}
-        self.num_of_classes = 7
 
         x_dataset = [embedding[1] for embedding in data]
         y_dataset = [label[2] for label in data]
-        train_x, test_x, train_y, test_y = train_test_split(np.array(x_dataset), np.array(y_dataset), test_size=0.30)
+        train_x, test_x, train_y, test_y = train_test_split(np.array(x_dataset), np.array(y_dataset), test_size=0.20)
         train_x = torch.from_numpy(train_x)
         train_y = torch.from_numpy(train_y)
         torch_train = TensorDataset(train_x, train_y)

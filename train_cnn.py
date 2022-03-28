@@ -34,7 +34,7 @@ epoch, batch_size = model.get_epochs(), model.get_batch_size()
 
 n_total_steps = len(dataset.train_loader)
 
-for epoch in range(model.get_epochs()):
+for epoch in range(0):
     for i, (embedding, labels) in enumerate(dataset.train_loader):
 
         embedding = embedding.to(device)
@@ -50,7 +50,7 @@ for epoch in range(model.get_epochs()):
         loss.backward()
         optimizer.step()
 
-        if (i + 1) % 77 == 0:
+        if (i + 1) % 40 == 0:
             print(f'Epoch [{epoch + 1}/{model.get_epochs()}], Step [{i + 1}/{n_total_steps}], Loss: {loss.item():.4f}')
 
 saved_results = []
