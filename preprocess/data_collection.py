@@ -221,14 +221,31 @@ from sklearn.model_selection import train_test_split
 if __name__ == '__main__':
     filehandler = open('data/datasets/dataset2.pth', 'rb')
     check_sig = pickle.load(filehandler)
-
+    new_distribution = []
     counter = [0 for i in range(7)]
-
+    classes = [0, 0, 0]
     for tup in check_sig:
         counter[tup[2]] += 1
+        m_class = -1
+        if tup[2] == 0 or tup[2] == 2: # POSITIVE( HAPPY, SURPRISED )
+            m_class = 0
+        if tup[2] == 1: # NEUTRAL( CALM ) USELESS CONDITION ONLY FOR UNDERSTANDING
+            m_class = 1
+        if tup[2] == 3 or tup[2] == 4 or tup[2] == 5 or tup[2] == 6: # NEGATIVE( SAD, ANGRY, FEAR, DISGUST )
+            m_class = 2
 
-    print(counter)
+        classes[m_class] += 1
 
+        new_distribution.append((tup[0], tup[1], m_class))
+
+    print(f'Before: {counter}, total: {np.sum(counter)}')
+    print(f'After: {classes}, total: {np.sum(classes)}')
+
+    file_pth = open('data/datasets/dataset3.pth', 'wb')
+    pickle.dump(new_distribution, file_pth)
+
+
+# OLD: [0: surprise, 1 :calm, 2:happy, 3: sad, 4: angry, 5: fear, 6: disgust]
+# NEW: [0: positive, 1: neutral, 2: negative]
 # now: [407, 613, 522, 691, 469, 202, 592]
 # before: [407, 513, 422, 591, 370, 202, 592]
-

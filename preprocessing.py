@@ -6,17 +6,12 @@ import pickle
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.model_selection import train_test_split
 
-# Hyper-parameters
-num_epochs = 700
-batch_size = 35
-learning_rate = 0.001
-
 
 class Data:
 
     def __init__(self):
-        filehandler = open('dataset.pth', 'rb')
-        data = pickle.load(filehandler)
+        file_handler = open('data/datasets/dataset2.pth', 'rb')
+        data = pickle.load(file_handler)
 
         # surprise has been changed from 8 to 0
         self.classes = {0: 'surprise', 1: 'calm', 2: 'happy', 3: 'sad', 4: 'angry', 5: 'fear', 6: 'disgust'}
@@ -34,5 +29,4 @@ class Data:
         torch_test = TensorDataset(test_x, test_y)
 
         self.train_loader = DataLoader(torch_train, batch_size=28, drop_last=True, shuffle=True)
-
         self.test_loader = DataLoader(torch_test, batch_size=28, drop_last=True, shuffle=False)
