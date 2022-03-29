@@ -18,7 +18,7 @@ def top_k_accuracy(k, proba_pred_y, mini_y_test):
     return np.mean(final_pred)
 
 
-filehandler = open('data/dataset.pth', 'rb')
+filehandler = open('data/dataset_linux.pth', 'rb')
 dataset = pickle.load(filehandler)
 dataset = Data()
 
