@@ -19,7 +19,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
 model = bundle.get_model().to(device)
 
-classes = {0:"Positive", 1:"Neutral" ,2:"Negative"}
+classes = {0: "Positive", 1: "Neutral", 2: "Negative"}
+
 
 def Norm(X):
     embedding = X.detach().cpu().numpy()
@@ -30,22 +31,21 @@ def Norm(X):
 
 
 def recording(name):
-	filename = name
-	fps = 16000
-	duration = 3
-	print("Recording ..")
-	recording = sounddevice.rec(int(duration * fps), samplerate = fps, channels = 2)
-	sounddevice.wait()
-	print("Done.")
-	write(filename+".wav", fps, recording)
-	return filename + ".wav"
-
+    filename = name
+    fps = 16000
+    duration = 3
+    print("Recording ..")
+    recording = sounddevice.rec(int(duration * fps), samplerate=fps, channels=2)
+    sounddevice.wait()
+    print("Done.")
+    write(filename + ".wav", fps, recording)
+    return filename + ".wav"
 
 
 def inference(file_name):
     waveform, sample_rate = torchaudio.load(recording(file_name))
     waveform = waveform.to(device)
-    waveform = waveform.view(1,96000)
+    waveform = waveform.view(1, 96000)
     if sample_rate != bundle.sample_rate:
         waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
 
@@ -55,16 +55,19 @@ def inference(file_name):
     return Norm(embedding)
 
 
-if __name__ == '__main__':
-    cnn = torch.load("dadaNet.pth" , map_location = torch.device("cpu"))
-    cnn.eval()
-    with torch.no_grad():
-    	y = cnn(inference("example10"))
-    y = y.cpu().detach().numpy()
+def print_results(y):
     predict = [np.exp(c) for c in y]
     max = np.argmax(predict)
-    sum = np.sum(predict)
-    for_or = [np.round(100*c,3) for c in predict]
-    print(for_or)
-    print(classes[max])
-   
+    print(f'Predicted: {classes[max].capitalize()}')
+    print(f'Positive: {round(predict[0][0] * 100, 4)}%')
+    print(f'Neutral: {round(predict[0][1] * 100, 4)}%')
+    print(f'Negative: {round(predict[0][2] * 100, 4)}%')
+
+
+if __name__ == '__main__':
+    cnn = torch.load("dadaNet.pth", map_location=torch.device("cpu"))
+    cnn.eval()
+    with torch.no_grad():
+        y = cnn(inference("example10"))
+    y = y.cpu().detach().numpy()
+    print_results(y)
