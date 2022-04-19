@@ -12,7 +12,7 @@ from scipy.io.wavfile import write
 from numpy import mat
 
 from Model import ConvNet
-from preprocessing import Data
+from dataset import Data
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # fine-tuning from wav2vec pytorch pipline

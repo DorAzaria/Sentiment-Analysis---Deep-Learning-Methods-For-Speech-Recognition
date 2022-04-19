@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from preprocessing import Data
+from dataset import Data
 
 DROP_OUT = 0.5
 NUM_OF_CLASSES = 3
