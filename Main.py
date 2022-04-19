@@ -7,63 +7,64 @@ import requests
 import torch
 import torchaudio
 import os
-
+import sounddevice
+from scipy.io.wavfile import write
 from numpy import mat
 
 from Model import ConvNet
-from Test import TestConvNet
-from preprocess.preprocessing import Data
+from preprocessing import Data
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # fine-tuning from wav2vec pytorch pipline
 bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
 model = bundle.get_model().to(device)
 
+classes = {0:"Positive", 1:"Neutral" ,2:"Negative"}
 
 def Norm(X):
     embedding = X.detach().cpu().numpy()
     for i in range(len(embedding)):
         mlist = embedding[0][i]
         embedding[0][i] = 2 * (mlist - np.max(mlist)) / (np.max(mlist) - np.min(mlist)) + 1
-        if embedding[0][i] < -1 or embedding[0][i] > 1:
-            print("NISHBAR HAZAIN")
-            break
-    return torch.from_numpy(embedding)
+    return torch.from_numpy(embedding).to(device)
 
 
 def recording(name):
-    # import sounddevice
-    # # from scipy.io.wavefile import write
-    # filename = name
-    # fps = 16000
-    # duration = 3
-    # print("Recording ..")
-    # recording = sounddevice.rec(int(duration * fps), samplerate = fps, channels = 2)
-    # sounddevice.wait()
-    # print("Done.")
-    # write(filename, fps, recording)
-    # return filename + ".wav"
-    pass
+	filename = name
+	fps = 16000
+	duration = 3
+	print("Recording ..")
+	recording = sounddevice.rec(int(duration * fps), samplerate = fps, channels = 2)
+	sounddevice.wait()
+	print("Done.")
+	write(filename+".wav", fps, recording)
+	return filename + ".wav"
+
 
 
 def inference(file_name):
     waveform, sample_rate = torchaudio.load(recording(file_name))
     waveform = waveform.to(device)
-
+    waveform = waveform.view(1,96000)
     if sample_rate != bundle.sample_rate:
         waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
 
     with torch.inference_mode():
         embedding, _ = model(waveform)
-
-    return embedding
+        embedding = embedding.unsqueeze(0)
+    return Norm(embedding)
 
 
 if __name__ == '__main__':
-    aer_dataset = Data()
-    cnn = ConvNet(3, aer_dataset)
-    cnn.train_model()
-    test = TestConvNet(cnn, aer_dataset)
-    test.test()
-    X = Norm(inference("dor_angry"))
-    predict = [mat.exp(c) for c in cnn.forward(X)]
+    cnn = torch.load("dadaNet.pth" , map_location = torch.device("cpu"))
+    cnn.eval()
+    with torch.no_grad():
+    	y = cnn(inference("example10"))
+    y = y.cpu().detach().numpy()
+    predict = [np.exp(c) for c in y]
+    max = np.argmax(predict)
+    sum = np.sum(predict)
+    for_or = [np.round(100*c,3) for c in predict]
+    print(for_or)
+    print(classes[max])
+   
