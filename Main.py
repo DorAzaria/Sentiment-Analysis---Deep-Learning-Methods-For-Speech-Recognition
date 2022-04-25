@@ -14,7 +14,12 @@ from numpy import mat
 from Model import ConvNet
 from Dataset import Data
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+SAMPLE_RATE = 16000
+
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
+
 # fine-tuning from wav2vec pytorch pipline
 bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
 model = bundle.get_model().to(device)
@@ -32,42 +37,44 @@ def Norm(X):
 
 def recording(name):
     filename = name
-    fps = 16000
     duration = 3
     print("Recording ..")
-    recording = sounddevice.rec(int(duration * fps), samplerate=fps, channels=2)
+    recording = sounddevice.rec(int(duration * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=1)
     sounddevice.wait()
     print("Done.")
-    write(filename + ".wav", fps, recording)
+    write(filename + ".wav", SAMPLE_RATE, recording)
     return filename + ".wav"
 
 
 def inference(file_name):
-    waveform, sample_rate = torchaudio.load(recording(file_name))
-    waveform = waveform.to(device)
-    waveform = waveform.view(1, 96000)
-    if sample_rate != bundle.sample_rate:
-        waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
+    waveform, sr = torchaudio.load(recording(file_name), num_frames = SAMPLE_RATE*3)
+    
+    if sr != bundle.sample_rate:
+        waveform = torchaudio.functional.resample(waveform, sr, bundle.sample_rate)
 
-    with torch.inference_mode():
-        embedding, _ = model(waveform)
-        embedding = embedding.unsqueeze(0)
-    return Norm(embedding)
+    waveform = waveform.to(device)
+
+    return waveform
 
 
 def print_results(y):
+    y = y.cpu().detach().numpy()
     predict = [np.exp(c) for c in y]
     max = np.argmax(predict)
     print(f'Predicted: {classes[max].capitalize()}')
     print(f'Positive: {round(predict[0][0] * 100, 4)}%')
-    print(f'Neutral: {round(predict[0][1] * 100, 4)}%')
+    print(f'Neutral:  {round(predict[0][1] * 100, 4)}%')
     print(f'Negative: {round(predict[0][2] * 100, 4)}%')
 
 
 if __name__ == '__main__':
     cnn = torch.load("dadaNet.pth", map_location=torch.device("cpu"))
     cnn.eval()
-    with torch.no_grad():
-        y = cnn(inference("example10"))
-    y = y.cpu().detach().numpy()
-    print_results(y)
+
+    with torch.inference_mode():
+        tor = inference("example10")
+        embedding, _ = model(tor)
+        embedding = embedding.unsqueeze(0)
+        embedding = Norm(embedding)
+        y = cnn(embedding)
+        print_results(y)
