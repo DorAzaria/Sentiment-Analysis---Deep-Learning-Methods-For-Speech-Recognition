@@ -1,21 +1,17 @@
 import torch
 import torch.nn as nn
-from Dataset import Data
-
-DROP_OUT = 0.5
+DROP_OUT = 0.8
 NUM_OF_CLASSES = 3
-
 
 class ConvNet(nn.Module):
 
-    def __init__(self, num_of_classes, dataset):
+    def __init__(self):
         super().__init__()
 
         # Hyper parameters
         self.epochs = 300
         self.batch_size = 32
         self.learning_rate = 0.0001
-        self.dataset = dataset
 
         # Model Architecture
         self.first_conv = nn.Conv2d(1, 96, kernel_size=(5, 5), padding=1) # (96, 147, 30)
@@ -48,7 +44,7 @@ class ConvNet(nn.Module):
         self.first_dense = nn.Linear(32, 1024)
         self.second_drop = nn.Dropout(p=DROP_OUT)
 
-        self.second_dense = nn.Linear(1024, num_of_classes)
+        self.second_dense = nn.Linear(1024, NUM_OF_CLASSES)
 
     def forward(self, X):
         x = nn.ReLU()(self.first_conv(X))
