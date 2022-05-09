@@ -3,10 +3,12 @@ import IPython
 import numpy as np
 import torch
 import torchaudio
+import random
 import sounddevice
 from scipy.io.wavfile import write
 from numpy import mat
 from Model import ConvNet
+
 
 SAMPLE_RATE = 16000
 
@@ -39,15 +41,31 @@ def recording(name):
     return filename + ".wav"
 
 
-def inference(file_name):
-    waveform, sr = torchaudio.load(recording(file_name), num_frames = SAMPLE_RATE*3)
-    
-    if sr != bundle.sample_rate:
-        waveform = torchaudio.functional.resample(waveform, sr, bundle.sample_rate)
+def inference(path):
+    signal = np.zeros((int(SAMPLE_RATE*3 ,)))
+
+    waveform, sampling_rate = torchaudio.load(filepath=recording(path), num_frames=SAMPLE_RATE * 3)
+    # waveform, sampling_rate = torchaudio.load(filepath=path, num_frames=SAMPLE_RATE * 3)
+
 
     waveform = waveform.to(device)
+    waveform = waveform.detach().cpu().numpy()[0]
 
-    return waveform
+    if len(waveform) <= 48000 and len(waveform) >= 32000:
+        signal[:len(waveform)] = waveform
+
+        if sampling_rate < 48000: # if there is more to fill
+          rest = len(signal) - len(waveform) # get the "rest length"
+          filled_list = signal[:len(waveform)] # we don't want to choose zero values, so this list contains non-zero values only.
+          signal[len(waveform):] = random.choices(filled_list, k=rest) # choose k values from the filled_list
+          
+        signal_final = np.array([np.array(signal)])
+        signal_final = torch.from_numpy(signal_final).to(device)
+        signal_final = signal_final.type(torch.FloatTensor).to(device)
+
+        return signal_final
+
+    return -1
 
 
 def print_results(y):
@@ -69,5 +87,6 @@ if __name__ == '__main__':
         embedding, _ = model(tor)
         embedding = embedding.unsqueeze(0)
         embedding = Norm(embedding)
+        print(embedding.shape)
         y = cnn(embedding)
         print_results(y)
