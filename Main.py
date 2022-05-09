@@ -87,6 +87,5 @@ if __name__ == '__main__':
         embedding, _ = model(tor)
         embedding = embedding.unsqueeze(0)
         embedding = Norm(embedding)
-        print(embedding.shape)
         y = cnn(embedding)
         print_results(y)
