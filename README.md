@@ -1,6 +1,6 @@
 # Sentiment Analysis - Deep Learning Methods For Speech Recognition
 
-Deep learning has emerged as a powerful machine learning technique that learns multiple layers of representations or features of the data and produces state-of-the-art prediction results. Along with the success of deep learning in many other application domains, deep learning is also popularly used in sentiment analysis.
+Our emotions are an integral part of our lives, they usually reflect our opinions and our desires. It can be seen that there is a clear connection between emotions and human behavior. The ability to identify emotions provides many options in various aspects such as social media, market research, customer experience and more. As part of our work, we have fine-tuned a pre-trained model that trains on raw audio data and learns its contextual representation. With the help of fine-tuning, we can tweak this model to perform our task which is emotion recognition.
 
 ### Sentiments
 For better accuracy results, we decided to focus on 3 different class labels.
